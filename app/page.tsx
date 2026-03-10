@@ -109,7 +109,7 @@ export default function LoginPage() {
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-red-500/10 blur-3xl hidden lg:block z-0 pointer-events-none"></div>
 
         {/* BUNGKUS KARTU (GLASSMORPHISM HP + ELEVATED CARD DESKTOP) */}
-        <div className="relative w-full max-w-md bg-white/30 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none rounded-3xl lg:rounded-[2rem] shadow-2xl lg:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] border border-white/50 lg:border-slate-100/80 animate-in fade-in zoom-in-95 duration-700 z-10">
+        <div className="relative w-full max-w-md bg-white/50 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none rounded-3xl lg:rounded-[2rem] shadow-2xl lg:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] border border-white/50 lg:border-slate-100/80 animate-in fade-in zoom-in-95 duration-700 z-10">
           
           {/* ==========================================
               EFEK LASER CHROME (HANYA DI MOBILE)
