@@ -1,40 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { Calculator, AlertTriangle, CheckCircle2, Truck, Trophy, ArrowRight, ArrowLeft, Save } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../../../lib/supabase"; 
+import { Calculator, AlertTriangle, CheckCircle2, Truck, Trophy, ArrowRight, ArrowLeft, Save, Loader2, X } from "lucide-react";
 
 const criteriaList = ["C1 Biaya", "C2 Kecepatan", "C3 Ketepatan", "C4 Pelacakan", "C5 Layanan", "C6 Keamanan"];
 const alternativesList = ["Lalamove", "Deliveree", "GoBox"];
 
 export default function PenilaianAHPPage() {
+  const router = useRouter();
   const n = criteriaList.length;
   const m = alternativesList.length;
   
-  // State untuk melacak langkah saat ini (1 = AHP, 2 = TOPSIS, 3 = Hasil)
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+  const [keterangan, setKeterangan] = useState("");
   
-  // State AHP
+  // State untuk Popup Warning
+  const [showWarning, setShowWarning] = useState(false);
+
   const [matrix, setMatrix] = useState<number[][]>(Array(n).fill(null).map(() => Array(n).fill(1)));
   const [crStatus, setCrStatus] = useState<"idle" | "success" | "error">("idle");
   const [crValue, setCrValue] = useState<number>(0);
-
-  // State TOPSIS (Baris = Alternatif, Kolom = Kriteria)
   const [topsisMatrix, setTopsisMatrix] = useState<string[][]>(Array(m).fill(null).map(() => Array(n).fill("")));
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Handle Input AHP
   const handleValueChange = (row: number, col: number, value: string) => {
     const numValue = parseFloat(value);
     if (isNaN(numValue) || numValue <= 0) return;
     const newMatrix = [...matrix.map(r => [...r])];
     newMatrix[row][col] = numValue;
-    newMatrix[col][row] = 1 / numValue; // Rumus kebalikan
+    newMatrix[col][row] = 1 / numValue; 
     setMatrix(newMatrix);
     setCrStatus("idle");
   };
 
-  // Handle Validasi AHP
   const handleHitungCR = () => {
-    const simulatedCR = 0.08; // Dummy hitungan
+    if (!keterangan) {
+      // Munculin Custom Popup Warning, bukan alert() browser lagi
+      setShowWarning(true);
+      return;
+    }
+    const simulatedCR = 0.08; 
     setCrValue(simulatedCR);
     if (simulatedCR <= 0.1) {
       setCrStatus("success");
@@ -43,24 +50,49 @@ export default function PenilaianAHPPage() {
     }
   };
 
-  // Handle Input TOPSIS
   const handleTopsisChange = (altIndex: number, critIndex: number, value: string) => {
     const newTopsisMatrix = [...topsisMatrix.map(r => [...r])];
     newTopsisMatrix[altIndex][critIndex] = value;
     setTopsisMatrix(newTopsisMatrix);
   };
 
-  // Handle Proses Akhir
   const handleProsesTopsis = () => {
-    setCurrentStep(3); // Pindah ke layar hasil akhir
+    setCurrentStep(3); 
+  };
+
+  const handleSimpanRiwayat = async () => {
+    try {
+      setIsSaving(true);
+      const hasilRekomendasi = "Lalamove";
+      const skorVi = 0.854;
+      const statusCr = crStatus === "success" ? "Konsisten" : "Tidak Konsisten";
+
+      const { error } = await supabase
+        .from("decision_history")
+        .insert([
+          {
+            description: keterangan,
+            winner_name: hasilRekomendasi,
+            final_score: skorVi,
+            cr_status: statusCr
+          }
+        ]);
+
+      if (error) throw error;
+      router.push("/dashboard/riwayat");
+
+    } catch (error: any) {
+      console.error("Gagal menyimpan ke database:", error);
+      alert(`Gagal menyimpan data: ${error.message}`);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <div className="max-w-6xl mx-auto pb-10">
       
-      {/* =========================================
-          LANGKAH 1: MATRIKS AHP 
-          ========================================= */}
+      {/* LANGKAH 1 */}
       {currentStep === 1 && (
         <div className="animate-in fade-in duration-300">
           <div className="flex items-center space-x-3 mb-6">
@@ -76,6 +108,20 @@ export default function PenilaianAHPPage() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="p-6 border-b border-slate-200 bg-slate-50">
+              <label className="block text-sm font-bold text-slate-700 mb-2">
+                Keterangan Penilaian (Wajib)
+              </label>
+              <input
+                type="text"
+                value={keterangan}
+                onChange={(e) => setKeterangan(e.target.value)}
+                placeholder="Contoh: Pemilihan Logistik Shampo Wax Bulan Depan"
+                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-600 outline-none text-slate-800 font-medium bg-white"
+                required
+              />
+            </div>
+
             <div className="overflow-x-auto p-6">
               <table className="w-full text-sm text-center border-collapse">
                 <thead>
@@ -136,7 +182,6 @@ export default function PenilaianAHPPage() {
             </div>
           </div>
 
-          {/* Notifikasi Validasi AHP */}
           {crStatus !== "idle" && (
             <div className={`mt-6 p-5 rounded-xl border flex items-start space-x-4 shadow-sm ${
               crStatus === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"
@@ -149,7 +194,7 @@ export default function PenilaianAHPPage() {
                 </p>
                 {crStatus === "success" && (
                   <button 
-                    onClick={() => setCurrentStep(2)} // Pindah ke Langkah 2
+                    onClick={() => setCurrentStep(2)} 
                     className="mt-4 px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-bold hover:bg-emerald-700 transition-all shadow flex items-center"
                   >
                     Lanjut ke Evaluasi TOPSIS <ArrowRight className="ml-2 w-4 h-4" />
@@ -161,9 +206,7 @@ export default function PenilaianAHPPage() {
         </div>
       )}
 
-      {/* =========================================
-          LANGKAH 2: INPUT TOPSIS
-          ========================================= */}
+      {/* LANGKAH 2 */}
       {currentStep === 2 && (
         <div className="animate-in slide-in-from-right-8 fade-in duration-500">
           <div className="flex items-center space-x-3 mb-6">
@@ -216,14 +259,14 @@ export default function PenilaianAHPPage() {
             
             <div className="p-6 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
               <button 
-                onClick={() => setCurrentStep(1)} // Balik ke Langkah 1
+                onClick={() => setCurrentStep(1)} 
                 className="px-5 py-2.5 text-slate-600 font-bold hover:bg-slate-200 rounded-lg transition-all flex items-center"
               >
                 <ArrowLeft className="mr-2 w-4 h-4" /> Kembali ke AHP
               </button>
               
               <button 
-                onClick={handleProsesTopsis} // Lanjut ke Hasil
+                onClick={handleProsesTopsis} 
                 className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md flex items-center"
               >
                 Proses Ranking TOPSIS <ArrowRight className="ml-2 w-4 h-4" />
@@ -233,13 +276,10 @@ export default function PenilaianAHPPage() {
         </div>
       )}
 
-      {/* =========================================
-          LANGKAH 3: HASIL AKHIR 
-          ========================================= */}
+      {/* LANGKAH 3 */}
       {currentStep === 3 && (
         <div className="animate-in zoom-in-95 fade-in duration-500">
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 shadow-xl border border-slate-700 text-white relative overflow-hidden">
-            {/* Hiasan background */}
             <div className="absolute top-0 right-0 -mt-10 -mr-10 text-slate-700/30">
               <Trophy className="w-64 h-64" />
             </div>
@@ -261,23 +301,66 @@ export default function PenilaianAHPPage() {
                 </div>
                 <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-700">
                   <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Status CR</p>
-                  <p className="text-2xl font-bold text-blue-400">Konsisten</p>
+                  <p className="text-2xl font-bold text-blue-400">{crStatus === "success" ? "Konsisten" : "Tidak Konsisten"}</p>
                 </div>
               </div>
 
               <div className="flex space-x-4 mt-8">
-                 <button 
+                <button 
                   onClick={() => setCurrentStep(2)} 
-                  className="px-5 py-3 bg-slate-700 text-white rounded-xl font-bold hover:bg-slate-600 transition-all flex items-center"
+                  disabled={isSaving}
+                  className="px-5 py-3 bg-slate-700 text-white rounded-xl font-bold hover:bg-slate-600 transition-all flex items-center disabled:opacity-50"
                 >
                   <ArrowLeft className="mr-2 w-5 h-5" /> Revisi Nilai
                 </button>
-                <button className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-lg flex items-center">
-                  <Save className="mr-2 w-5 h-5" />
-                  Simpan ke Riwayat
+                <button 
+                  onClick={handleSimpanRiwayat}
+                  disabled={isSaving}
+                  className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-lg flex items-center disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 w-5 h-5" />
+                      Simpan ke Riwayat
+                    </>
+                  )}
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
+          MODAL WARNING CUSTOM (KETERANGAN KOSONG)
+          ========================================== */}
+      {showWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 text-center p-6 relative">
+            <button 
+              onClick={() => setShowWarning(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1.5 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-amber-50 mb-4 mt-2 border border-amber-100">
+              <AlertTriangle className="h-8 w-8 text-amber-500" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">Peringatan</h3>
+            <p className="text-sm text-slate-500 mb-8 px-2 leading-relaxed">
+              Keterangan Penilaian wajib diisi bro! Silakan isi terlebih dahulu sebelum menghitung dan validasi matriks.
+            </p>
+            <button
+              onClick={() => setShowWarning(false)}
+              className="w-full py-3 text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+            >
+              Oke, Mengerti
+            </button>
           </div>
         </div>
       )}
