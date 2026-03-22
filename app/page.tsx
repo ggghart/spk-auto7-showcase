@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Lock, User, ShieldCheck, AlertCircle, X, KeySquare, Loader2, CheckCircle2 } from "lucide-react";
+// Gw tambahin import Eye dan EyeOff di sini bro
+import { Lock, User, ShieldCheck, AlertCircle, X, KeySquare, Loader2, CheckCircle2, Info, CheckSquare, Eye, EyeOff } from "lucide-react";
 import { supabase } from "../lib/supabase"; 
 
 export default function LoginPage() {
@@ -14,6 +15,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
+  // STATE BARU: UNTUK HIDE/UNHIDE PASSWORD
+  const [showPassword, setShowPassword] = useState(false);
 
   // STATE BARU: MODAL LUPA PASSWORD
   const [showResetModal, setShowResetModal] = useState(false);
@@ -21,6 +25,20 @@ export default function LoginPage() {
   const [isResetting, setIsResetting] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
   const [resetError, setResetError] = useState<string | null>(null);
+
+  // ==========================================
+  // STATE BARU: MODAL INFO PORTFOLIO & FLOATING BUTTON
+  // ==========================================
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [hasUnderstood, setHasUnderstood] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowInfoModal(true);
+    }, 500); 
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // ==========================================
   // FUNGSI LOGIN
@@ -70,32 +88,26 @@ export default function LoginPage() {
       setIsResetting(true);
       setResetError(null);
 
-      // 1. CEK DULU KE TABEL PROFILES (Apakah Pegawai Ini Ada?)
-      // Note: Di sini gw ngecek ke kolom 'full_name'. Kalau di tabel lu ada kolom 'username', ganti ya.
-      // Pakai ilike biar "Ojan" dan "ojan" tetep kebaca.
       const { data: existingUser, error: checkError } = await supabase
         .from("profiles")
         .select("id")
-        .ilike("full_name", `%${resetUsername}%`) 
+        .eq("username", resetUsername) 
         .limit(1);
 
       if (checkError) throw checkError;
 
-      // Kalau array-nya kosong, berarti orangnya kagak ada!
       if (!existingUser || existingUser.length === 0) {
         setResetError("Username tidak ditemukan di sistem Auto7!");
         setIsResetting(false);
-        return; // Berhenti di sini, jangan di-insert!
+        return; 
       }
 
-      // 2. KALAU ORANGNYA ADA, BARU KITA INSERT REQUEST-NYA
       const { error: insertError } = await supabase
         .from("password_reset_requests")
         .insert([{ username: resetUsername }]);
 
       if (insertError) throw insertError;
 
-      // Berhasil ngirim ke Owner
       setResetSuccess(true);
     } catch (error: any) {
       console.error("Error minta reset:", error);
@@ -105,7 +117,6 @@ export default function LoginPage() {
     }
   };
 
-  // Fungsi tutup modal reset
   const closeResetModal = () => {
     setShowResetModal(false);
     setResetUsername("");
@@ -116,6 +127,20 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex font-sans relative bg-slate-900 lg:bg-slate-50 overflow-hidden">
       
+      {/* ==========================================
+          FLOATING BUTTON INFO (BERGERAK/ANIMASI) - TEMA MERAH
+          ========================================== */}
+      <button 
+        onClick={() => setShowInfoModal(true)}
+        className="fixed bottom-6 right-6 z-40 bg-red-600 text-white p-4 rounded-full shadow-[0_0_20px_rgba(220,38,38,0.5)] hover:bg-red-700 transition-all hover:scale-110 flex items-center justify-center group animate-bounce duration-1000"
+        title="Informasi Portfolio"
+      >
+        <Info className="w-6 h-6 animate-pulse" />
+        <span className="absolute right-full mr-4 bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          Info Portfolio
+        </span>
+      </button>
+
       {/* ==========================================
           BACKGROUND KHUSUS MOBILE (LASER AMAN)
           ========================================== */}
@@ -135,7 +160,6 @@ export default function LoginPage() {
           SISI KIRI: DESKTOP ONLY DENGAN ANIMASI MASUK
           ========================================== */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-slate-900 items-end justify-center overflow-hidden z-10 group">
-        {/* Gambar mobil pelan-pelan nge-zoom kalau di hover (Cinematic Feel) */}
         <div className="absolute inset-0 transform transition-transform duration-[10000ms] ease-out group-hover:scale-110">
           <Image 
             src="/mobil1.png" 
@@ -148,7 +172,6 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10"></div>
         
-        {/* Teks animasi masuk dari bawah */}
         <div className="relative z-20 p-16 w-full text-left animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="inline-flex items-center space-x-2 bg-red-600/80 text-white backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6 shadow-lg">
             <ShieldCheck className="w-4 h-4" />
@@ -165,25 +188,19 @@ export default function LoginPage() {
       </div>
 
       {/* ==========================================
-          SISI KANAN: FORM LOGIN (ELEVATED CARD + SAAS GRID)
+          SISI KANAN: FORM LOGIN
           ========================================== */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-24 relative z-20 min-h-screen lg:min-h-0 lg:bg-slate-50">
         
-        {/* DOT GRID PATTERN KHUSUS DESKTOP */}
         <div 
           className="absolute inset-0 z-0 hidden lg:block opacity-[0.15]" 
           style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '24px 24px' }}
         ></div>
 
-        {/* GLOWING ORB MERAH SAMAR DI DESKTOP */}
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-red-500/10 blur-3xl hidden lg:block z-0 pointer-events-none"></div>
 
-        {/* BUNGKUS KARTU (GLASSMORPHISM HP + ELEVATED CARD DESKTOP) */}
         <div className="relative w-full max-w-md bg-white/50 lg:bg-white backdrop-blur-sm lg:backdrop-blur-none rounded-3xl lg:rounded-[2rem] shadow-2xl lg:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] border border-white/50 lg:border-slate-100/80 animate-in fade-in zoom-in-95 duration-700 z-10 mb-8 lg:mb-0">
           
-          {/* ==========================================
-              EFEK LASER CHROME (HANYA DI MOBILE)
-              ========================================== */}
           <div 
             className="absolute inset-0 z-0 pointer-events-none rounded-3xl lg:rounded-[2rem] p-[2px] overflow-hidden lg:hidden"
             style={{
@@ -198,9 +215,6 @@ export default function LoginPage() {
             ></div>
           </div>
 
-          {/* ==========================================
-              ISI FORM 
-              ========================================== */}
           <div className="relative z-10 p-8 sm:p-10 lg:p-12 space-y-10">
             <div className="text-left">
               <Image 
@@ -244,7 +258,6 @@ export default function LoginPage() {
                     <label className="block text-xs font-bold text-slate-800 lg:text-slate-700 uppercase tracking-wider drop-shadow-sm lg:drop-shadow-none">
                       Password
                     </label>
-                    {/* TOMBOL LUPA PASSWORD */}
                     <button 
                       type="button"
                       onClick={() => setShowResetModal(true)}
@@ -258,12 +271,26 @@ export default function LoginPage() {
                       <Lock className="h-5 w-5 text-slate-600 lg:text-slate-400 group-focus-within:text-red-600 transition-colors" />
                     </div>
                     <input
-                      type="password"
+                      // Tipe inputnya diganti biar dinamis ngikutin state
+                      type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-3.5 bg-white/50 lg:bg-slate-50/50 border border-white/50 lg:border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all text-sm font-bold lg:font-medium placeholder-slate-600 lg:placeholder-slate-400 shadow-inner lg:shadow-none hover:bg-white"
+                      // pr-nya gw gedein dikit (pr-12) biar teks ga nabrak icon mata
+                      className="block w-full pl-12 pr-12 py-3.5 bg-white/50 lg:bg-slate-50/50 border border-white/50 lg:border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all text-sm font-bold lg:font-medium placeholder-slate-600 lg:placeholder-slate-400 shadow-inner lg:shadow-none hover:bg-white"
                       placeholder="••••••••"
                     />
+                    {/* Ini tombol mata buat unhide passwordnya */}
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-red-600 focus:outline-none transition-colors"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -273,7 +300,6 @@ export default function LoginPage() {
                 disabled={isLoading}
                 className="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow-lg shadow-red-600/30 lg:shadow-red-600/20 text-sm font-bold text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-2 uppercase tracking-wide overflow-hidden relative group"
               >
-                {/* Efek kilatan cahaya (Shine) pas di hover */}
                 <span className="absolute top-0 -left-[100%] w-1/2 h-full bg-white/20 skew-x-[45deg] group-hover:left-[200%] transition-all duration-700 ease-in-out"></span>
                 
                 {isLoading ? (
@@ -289,9 +315,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* ==========================================
-            COPYRIGHT FOOTER (Premium Minimalist)
-            ========================================== */}
         <div className="absolute bottom-6 w-full text-center z-10 px-4">
           <p className="text-[11px] sm:text-xs font-semibold tracking-wider text-white/60 lg:text-slate-400 hover:text-white lg:hover:text-slate-600 transition-colors cursor-default drop-shadow-sm lg:drop-shadow-none">
             &copy; 2026 AUTO7 Carwash. All rights reserved.
@@ -330,6 +353,101 @@ export default function LoginPage() {
       )}
 
       {/* ==========================================
+          MODAL INFO PORTFOLIO DENGAN CHECKBOX - TEMA MERAH
+          ========================================== */}
+      {showInfoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-500 relative flex flex-col max-h-[90vh]">
+            
+            {/* Header Modal */}
+            <div className="bg-red-600 p-6 text-white text-center relative shrink-0">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-white/20 mb-3 backdrop-blur-sm border border-white/30 shadow-inner">
+                <Info className="h-8 w-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-extrabold tracking-tight">Showcase Portfolio</h2>
+              <p className="text-red-100 text-sm font-medium mt-1">Sistem Pendukung Keputusan Logistik Auto7</p>
+            </div>
+
+            {/* Content Modal (Bisa di-scroll kalau kepanjangan) */}
+            <div className="p-6 md:p-8 overflow-y-auto grow custom-scrollbar">
+              <div className="space-y-6 text-sm text-slate-600">
+                
+                {/* Section 1: Konteks Project */}
+                <div>
+                  <h3 className="text-slate-900 font-bold flex items-center mb-2 text-base">
+                    <span className="bg-red-100 text-red-700 w-6 h-6 rounded-md inline-flex items-center justify-center mr-2 text-xs">1</span>
+                    Tentang Sistem Ini
+                  </h3>
+                  <p className="leading-relaxed pl-8">
+                    Ini adalah versi <strong className="text-red-600">demonstrasi/portfolio</strong> dari SPK Auto7 Carwash. Sistem menggunakan metode <strong className="text-slate-800">AHP + TOPSIS</strong> untuk merekomendasikan layanan logistik. Database aman dan terpisah dari sistem inti perusahaan.
+                  </p>
+                </div>
+
+                {/* Section 2: Info Akun */}
+                <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl pl-8 relative">
+                  <div className="absolute left-0 top-4 -ml-3 bg-red-100 text-red-700 w-6 h-6 rounded-md inline-flex items-center justify-center text-xs font-bold border border-white shadow-sm">2</div>
+                  <h3 className="text-slate-900 font-bold mb-3">Akun Testing Tersedia</h3>
+                  <div className="grid gap-3">
+                    <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                      <div className="font-bold text-red-600 text-xs uppercase tracking-wider mb-1">Role: Owner (Full Access)</div>
+                      <div className="flex justify-between items-center"><span className="text-slate-500 text-xs">Username:</span> <strong className="text-slate-800">owner.auto7</strong></div>
+                      <div className="flex justify-between items-center mt-1"><span className="text-slate-500 text-xs">Password:</span> <strong className="text-slate-800">Auto7Owner123!</strong></div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                      <div className="font-bold text-slate-600 text-xs uppercase tracking-wider mb-1">Role: Employee (Limited)</div>
+                      <div className="flex justify-between items-center"><span className="text-slate-500 text-xs">Username:</span> <strong className="text-slate-800">ahmad123</strong></div>
+                      <div className="flex justify-between items-center mt-1"><span className="text-slate-500 text-xs">Password:</span> <strong className="text-slate-800">Auto7Karyawan!</strong></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3: Fitur Spesifik */}
+                <div>
+                  <h3 className="text-slate-900 font-bold flex items-center mb-2 text-base">
+                    <span className="bg-red-100 text-red-700 w-6 h-6 rounded-md inline-flex items-center justify-center mr-2 text-xs">3</span>
+                    Simulasi Lupa Password
+                  </h3>
+                  <p className="leading-relaxed pl-8">
+                    Fitur "Lupa Password" di halaman ini dikonfigurasi sebagai simulasi. Permintaan akan dikirimkan ke <strong className="text-slate-800">Dashboard Owner</strong> untuk di-<em>approve</em> secara manual.
+                  </p>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Footer Modal dengan Checkbox */}
+            <div className="p-6 border-t border-slate-100 bg-slate-50 shrink-0">
+              <label className="flex items-start space-x-3 cursor-pointer group mb-5 px-2">
+                <div className="relative flex items-center justify-center mt-0.5">
+                  <input 
+                    type="checkbox" 
+                    className="peer sr-only"
+                    checked={hasUnderstood}
+                    onChange={(e) => setHasUnderstood(e.target.checked)}
+                  />
+                  <div className="w-5 h-5 bg-white border-2 border-slate-300 rounded peer-checked:bg-red-600 peer-checked:border-red-600 transition-colors flex items-center justify-center">
+                    <CheckSquare className="w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+                <span className="text-sm font-medium text-slate-700 select-none group-hover:text-slate-900 transition-colors leading-tight pt-0.5">
+                  Saya mengerti bahwa ini adalah lingkungan demo dan siap menjelajahi sistem.
+                </span>
+              </label>
+
+              <button
+                onClick={() => setShowInfoModal(false)}
+                disabled={!hasUnderstood}
+                className="w-full py-3.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-all shadow-lg shadow-red-600/20 disabled:opacity-50 disabled:bg-slate-400 disabled:shadow-none disabled:cursor-not-allowed uppercase tracking-wide"
+              >
+                Masuk ke Aplikasi
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
           MODAL LUPA PASSWORD (KIRIM KE OWNER)
           ========================================== */}
       {showResetModal && (
@@ -345,7 +463,6 @@ export default function LoginPage() {
             </button>
 
             {resetSuccess ? (
-              // TAMPILAN JIKA SUKSES
               <div className="p-8">
                 <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-emerald-50 mb-5 border-4 border-emerald-100">
                   <CheckCircle2 className="h-10 w-10 text-emerald-500" />
@@ -362,10 +479,9 @@ export default function LoginPage() {
                 </button>
               </div>
             ) : (
-              // TAMPILAN FORM REQUEST
               <div className="p-8">
-                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-50 mb-5 border border-blue-100">
-                  <KeySquare className="h-8 w-8 text-blue-600" />
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-50 mb-5 border border-red-100">
+                  <KeySquare className="h-8 w-8 text-red-600" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-800 mb-2">Lupa Password?</h3>
                 <p className="text-sm text-slate-500 mb-6 px-2 leading-relaxed">
@@ -376,13 +492,13 @@ export default function LoginPage() {
                   <div>
                     <div className="relative group text-left">
                       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <User className="h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                        <User className="h-5 w-5 text-slate-400 group-focus-within:text-red-600 transition-colors" />
                       </div>
                       <input
                         type="text"
                         value={resetUsername}
                         onChange={(e) => setResetUsername(e.target.value)}
-                        className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none transition-all text-sm font-medium placeholder-slate-400 hover:bg-white"
+                        className="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all text-sm font-medium placeholder-slate-400 hover:bg-white"
                         placeholder="Ketik username Anda..."
                       />
                     </div>
@@ -392,7 +508,7 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={isResetting}
-                    className="w-full flex justify-center items-center py-3.5 px-4 rounded-xl shadow-lg shadow-blue-600/20 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full flex justify-center items-center py-3.5 px-4 rounded-xl shadow-lg shadow-red-600/20 text-sm font-bold text-white bg-red-600 hover:bg-red-700 focus:outline-none transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     {isResetting ? (
                       <>
