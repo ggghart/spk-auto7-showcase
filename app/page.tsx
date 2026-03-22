@@ -391,12 +391,12 @@ export default function LoginPage() {
                     <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
                       <div className="font-bold text-red-600 text-xs uppercase tracking-wider mb-1">Role: Owner (Full Access)</div>
                       <div className="flex justify-between items-center"><span className="text-slate-500 text-xs">Username:</span> <strong className="text-slate-800">owner.auto7</strong></div>
-                      <div className="flex justify-between items-center mt-1"><span className="text-slate-500 text-xs">Password:</span> <strong className="text-slate-800">Auto7Owner123!</strong></div>
+                      <div className="flex justify-between items-center mt-1"><span className="text-slate-500 text-xs">Password:</span> <strong className="text-slate-800">admin123</strong></div>
                     </div>
                     <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
                       <div className="font-bold text-slate-600 text-xs uppercase tracking-wider mb-1">Role: Employee (Limited)</div>
-                      <div className="flex justify-between items-center"><span className="text-slate-500 text-xs">Username:</span> <strong className="text-slate-800">ahmad123</strong></div>
-                      <div className="flex justify-between items-center mt-1"><span className="text-slate-500 text-xs">Password:</span> <strong className="text-slate-800">Auto7Karyawan!</strong></div>
+                      <div className="flex justify-between items-center"><span className="text-slate-500 text-xs">Username:</span> <strong className="text-slate-800">alexganteng</strong></div>
+                      <div className="flex justify-between items-center mt-1"><span className="text-slate-500 text-xs">Password:</span> <strong className="text-slate-800">baksotikus123</strong></div>
                     </div>
                   </div>
                 </div>
