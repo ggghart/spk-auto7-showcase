@@ -18,6 +18,7 @@ export default function ProfilPage() {
   // STATE DINAMIS UNTUK USER YANG SEDANG LOGIN
   const [currentUserRole, setCurrentUserRole] = useState<"Owner" | "Employee" | null>(null);
   const [currentUsername, setCurrentUsername] = useState<string>("");
+  const [currentFullName, setCurrentFullName] = useState<string>(""); // STATE BARU BUAT NAMA ASLI
 
   // State Data Pegawai
   const [pegawai, setPegawai] = useState<ProfilPegawai[]>([]);
@@ -63,9 +64,10 @@ export default function ProfilPage() {
         if (sessionError) throw sessionError;
 
         if (session?.user) {
+          // SEKARANG KITA TARIK JUGA full_name DARI DATABASE
           const { data: profile, error: profileError } = await supabase
             .from("profiles")
-            .select("role, username")
+            .select("role, username, full_name")
             .eq("id", session.user.id)
             .single();
 
@@ -74,6 +76,7 @@ export default function ProfilPage() {
           if (profile) {
             setCurrentUserRole(profile.role);
             setCurrentUsername(profile.username);
+            setCurrentFullName(profile.full_name); // SIMPAN NAMA ASLINYA DISINI
           }
         }
       } catch (error) {
@@ -167,7 +170,7 @@ export default function ProfilPage() {
   };
 
   // ==========================================
-  // FUNGSI GANTI PASSWORD SENDIRI (BARU)
+  // FUNGSI GANTI PASSWORD SENDIRI
   // ==========================================
   const handleUpdateMyPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,14 +189,12 @@ export default function ProfilPage() {
     try {
       setIsUpdatingPassword(true);
       
-      // Update password pakai fungsi bawaan Auth
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
 
       if (error) throw error;
 
-      // Sukses
       setIsChangePasswordOpen(false);
       setNewPassword("");
       setConfirmPassword("");
@@ -311,7 +312,8 @@ export default function ProfilPage() {
               </div>
               <div className="pb-2">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
-                  {currentUserRole === "Owner" ? "Owner Auto7" : "Staff Auto7"}
+                  {/* SEKARANG NAMPILIN NAMA ASLINYA BRO */}
+                  {currentFullName || (currentUserRole === "Owner" ? "Owner Auto7" : "Staff Auto7")}
                 </h1>
                 <div className="flex items-center mt-1 space-x-2">
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${
@@ -326,7 +328,6 @@ export default function ProfilPage() {
               </div>
             </div>
             
-            {/* TOMBOL GANTI PASSWORD DITAMBAHIN ONCLICK */}
             <button 
               onClick={() => setIsChangePasswordOpen(true)}
               className="px-5 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-all border border-slate-200 flex items-center justify-center"
@@ -505,7 +506,7 @@ export default function ProfilPage() {
       )}
 
       {/* ==========================================
-          MODAL GANTI PASSWORD SENDIRI (BARU)
+          MODAL GANTI PASSWORD SENDIRI
           ========================================== */}
       {isChangePasswordOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -646,7 +647,7 @@ export default function ProfilPage() {
       )}
 
       {/* ==========================================
-          MODAL TAMBAH AKUN PEGAWAI (LU PUNYA)
+          MODAL TAMBAH AKUN PEGAWAI
           ========================================== */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -711,7 +712,7 @@ export default function ProfilPage() {
       )}
 
       {/* ==========================================
-          MODAL HAPUS PEGAWAI (LU PUNYA)
+          MODAL HAPUS PEGAWAI
           ========================================== */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
