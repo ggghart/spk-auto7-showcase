@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Lock, User, ShieldCheck, AlertCircle, X, KeySquare, Loader2, CheckCircle2, Info, CheckSquare, Eye, EyeOff, Code2, MonitorPlay } from "lucide-react";
+import { Lock, User, ShieldCheck, AlertCircle, X, KeySquare, Loader2, CheckCircle2, Eye, EyeOff, Info, CheckSquare, Code2, MonitorPlay } from "lucide-react";
 import { supabase } from "../lib/supabase"; 
 
 export default function LoginPage() {
@@ -15,21 +15,23 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
-  // STATE BARU: UNTUK HIDE/UNHIDE PASSWORD
   const [showPassword, setShowPassword] = useState(false);
 
-  // STATE BARU: MODAL LUPA PASSWORD
+  // STATE MODAL LUPA PASSWORD
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetUsername, setResetUsername] = useState("");
   const [isResetting, setIsResetting] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
   const [resetError, setResetError] = useState<string | null>(null);
 
-  // ==========================================
-  // STATE BARU: MODAL INFO PORTFOLIO & FLOATING BUTTON
-  // ==========================================
+  // STATE MODAL INFO PORTFOLIO & FLOATING BUTTON
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [hasUnderstood, setHasUnderstood] = useState(false);
+
+  // ==========================================
+  // STATE BARU: ANIMASI MOBIL NGELIRIK KURSOR
+  // ==========================================
+  const [carTransform, setCarTransform] = useState("perspective(1000px) rotateY(0deg) rotateZ(0deg) scale(1)");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -40,27 +42,49 @@ export default function LoginPage() {
   }, []);
 
   // ==========================================
-  // FUNGSI LOGIN
+  // FUNGSI ANIMASI KURSOR (JALAN DI KOLOM KANAN AJA)
   // ==========================================
+  const handleRightSideMouseMove = (e: React.MouseEvent) => {
+    // Karena event ini cuma ada di div kanan, kita aman ngambil nilai X & Y kursor
+    const { clientX, clientY } = e;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    // Hitung rasio Y dari -1 (atas layar) sampai 1 (bawah layar)
+    const yRatio = (clientY - height / 2) / (height / 2);
+    
+    // Hitung rasio X dari 0 (tengah layar) sampai 1 (paling kanan)
+    const xRatio = (clientX - width / 2) / (width / 2);
+    
+    // Logika Orientasi: 
+    // yRatio ngatur moncong naik turun (Pitch / rotateZ)
+    // xRatio ngatur seberapa nengok dia ke arah kursor (Yaw / rotateY)
+    const rotateZ = yRatio * 15; // Maksimal nunduk/ndangak 15 derajat
+    const rotateY = xRatio * 20; // Maksimal nengok 20 derajat ke arah layar kanan
+    
+    // Set style transformnya (kasih scale 1.15 biar seakan-akan maju dikit)
+    setCarTransform(`perspective(1000px) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg) scale(1.15)`);
+  };
+
+  const handleRightSideMouseLeave = () => {
+    // Kalau kursor keluar dari form login, mobil balik ke posisi semula
+    setCarTransform("perspective(1000px) rotateY(0deg) rotateZ(0deg) scale(1)");
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!username || !password) {
       setErrorMessage("Username dan password tidak boleh kosong bro!");
       return;
     }
-
     try {
       setIsLoading(true);
       const dummyEmail = `${username.toLowerCase().replace(/\s/g, '')}@auto7.com`;
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email: dummyEmail,
         password: password,
       });
-
       if (error) throw error; 
-
       if (data.user) {
         router.push("/dashboard");
       }
@@ -72,41 +96,30 @@ export default function LoginPage() {
     }
   };
 
-  // ==========================================
-  // FUNGSI MINTA RESET PASSWORD (KIRIM KE OWNER)
-  // ==========================================
   const handleResetRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!resetUsername) {
       setResetError("Masukkan username Anda terlebih dahulu.");
       return;
     }
-
     try {
       setIsResetting(true);
       setResetError(null);
-
       const { data: existingUser, error: checkError } = await supabase
         .from("profiles")
         .select("id")
-        .eq("username", resetUsername) 
+        .ilike("username", `%${resetUsername}%`) 
         .limit(1);
-
       if (checkError) throw checkError;
-
       if (!existingUser || existingUser.length === 0) {
         setResetError("Username tidak ditemukan di sistem Auto7!");
         setIsResetting(false);
         return; 
       }
-
       const { error: insertError } = await supabase
         .from("password_reset_requests")
         .insert([{ username: resetUsername }]);
-
       if (insertError) throw insertError;
-
       setResetSuccess(true);
     } catch (error: any) {
       console.error("Error minta reset:", error);
@@ -126,9 +139,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex font-sans relative bg-slate-900 lg:bg-slate-50 overflow-hidden">
       
-      {/* ==========================================
-          FLOATING BUTTON INFO (BERGERAK/ANIMASI) - TEMA MERAH
-          ========================================== */}
+      {/* FLOATING BUTTON INFO */}
       <button 
         onClick={() => setShowInfoModal(true)}
         className="fixed bottom-6 right-6 z-40 bg-red-600 text-white p-4 rounded-full shadow-[0_0_20px_rgba(220,38,38,0.5)] hover:bg-red-700 transition-all hover:scale-110 flex items-center justify-center group animate-bounce duration-1000"
@@ -136,13 +147,11 @@ export default function LoginPage() {
       >
         <Info className="w-6 h-6 animate-pulse" />
         <span className="absolute right-full mr-4 bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-          Informasi Sistem
+          Info Portfolio
         </span>
       </button>
 
-      {/* ==========================================
-          BACKGROUND KHUSUS MOBILE (LASER AMAN)
-          ========================================== */}
+      {/* BACKGROUND KHUSUS MOBILE */}
       <div className="absolute inset-0 z-0 lg:hidden">
         <Image 
           src="/mobil1.png" 
@@ -156,10 +165,15 @@ export default function LoginPage() {
       </div>
 
       {/* ==========================================
-          SISI KIRI: DESKTOP ONLY DENGAN ANIMASI MASUK
+          SISI KIRI: DESKTOP ONLY DENGAN ANIMASI INTERAKTIF
           ========================================== */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-slate-900 items-end justify-center overflow-hidden z-10 group">
-        <div className="absolute inset-0 transform transition-transform duration-[10000ms] ease-out group-hover:scale-110">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-slate-900 items-end justify-center overflow-hidden z-10">
+        
+        {/* KONTENER GAMBAR MOBIL YANG DIKENDALIKAN STATE */}
+        <div 
+          className="absolute inset-0 transition-transform duration-200 ease-out origin-center"
+          style={{ transform: carTransform }}
+        >
           <Image 
             src="/mobil1.png" 
             alt="Premium Carwash Auto7" 
@@ -168,10 +182,11 @@ export default function LoginPage() {
             className="object-cover" 
           />
         </div>
-        <div className="absolute inset-0 bg-black/50 z-10"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10"></div>
         
-        <div className="relative z-20 p-16 w-full text-left animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div className="absolute inset-0 bg-black/50 z-10 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10 pointer-events-none"></div>
+        
+        <div className="relative z-20 p-16 w-full text-left animate-in fade-in slide-in-from-bottom-8 duration-1000 pointer-events-none">
           <div className="inline-flex items-center space-x-2 bg-red-600/80 text-white backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6 shadow-lg">
             <ShieldCheck className="w-4 h-4" />
             <span>Premium Wash & Detailing</span>
@@ -187,9 +202,13 @@ export default function LoginPage() {
       </div>
 
       {/* ==========================================
-          SISI KANAN: FORM LOGIN
+          SISI KANAN: FORM LOGIN (SEKALIGUS AREA SENSOR KURSOR)
           ========================================== */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-24 relative z-20 min-h-screen lg:min-h-0 lg:bg-slate-50">
+      <div 
+        className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-24 relative z-20 min-h-screen lg:min-h-0 lg:bg-slate-50"
+        onMouseMove={handleRightSideMouseMove}
+        onMouseLeave={handleRightSideMouseLeave}
+      >
         
         <div 
           className="absolute inset-0 z-0 hidden lg:block opacity-[0.15]" 
@@ -228,7 +247,7 @@ export default function LoginPage() {
                 Selamat Datang Kembali
               </h1>
               <p className="text-slate-700 lg:text-slate-500 font-medium text-sm mt-1 drop-shadow-sm lg:drop-shadow-none">
-                Silakan login ke portal SPK Logistik Auto7.
+                Silakan login ke SPK Logistik Auto7.
               </p>
             </div>
 
@@ -279,7 +298,7 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-red-600 focus:outline-none transition-colors"
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-600 lg:text-slate-400 hover:text-red-600 transition-colors focus:outline-none"
                     >
                       {showPassword ? (
                         <EyeOff className="h-5 w-5" />
@@ -312,16 +331,14 @@ export default function LoginPage() {
         </div>
 
         <div className="absolute bottom-6 w-full text-center z-10 px-4">
-          <p className="text-[11px] sm:text-xs font-semibold tracking-wider text-white/60 lg:text-slate-400 hover:text-white lg:hover:text-slate-600 transition-colors cursor-default drop-shadow-sm lg:drop-shadow-none">
+          <p className="text-[11px] sm:text-xs font-semibold tracking-wider text-white/60 lg:text-slate-400 hover:text-white lg:hover:text-slate-600 transition-colors cursor-default drop-shadow-sm lg:drop-shadow-none pointer-events-none">
             &copy; 2026 AUTO7 Carwash. All rights reserved.
           </p>
         </div>
 
       </div>
 
-      {/* ==========================================
-          MODAL ERROR CUSTOM
-          ========================================== */}
+      {/* MODAL ERROR CUSTOM */}
       {errorMessage && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 text-center p-6 relative">
@@ -348,9 +365,7 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* ==========================================
-          MODAL INFO PORTFOLIO (REFINED UX/UI)
-          ========================================== */}
+      {/* MODAL INFO PORTFOLIO */}
       {showInfoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-500 relative flex flex-col max-h-[90vh]">
@@ -360,7 +375,7 @@ export default function LoginPage() {
               <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-white/20 mb-3 backdrop-blur-sm border border-white/30 shadow-inner">
                 <Code2 className="h-7 w-7 text-white" />
               </div>
-              <h2 className="text-2xl font-extrabold tracking-tight"> Project Showcase</h2>
+              <h2 className="text-2xl font-extrabold tracking-tight">Project Showcase</h2>
               <p className="text-red-100 text-[13px] font-medium mt-1.5">Sistem Pendukung Keputusan Logistik Auto7 Carwash</p>
             </div>
 
@@ -378,7 +393,7 @@ export default function LoginPage() {
                   </h3>
                   <div className="space-y-3 text-[14px] leading-relaxed text-slate-600 ml-11">
                     <p>
-                      SPK Auto7 Carwash di-develop sebagai <strong className="text-slate-800 font-bold">internal project</strong> operasional perusahaan untuk mengoptimalkan proses pemilihan vendor logistik. Sistem ini menggunakan <em className="text-slate-700 not-italic font-medium">core engine</em> algoritma <strong className="text-red-600 font-bold">AHP dan TOPSIS</strong> guna menghasilkan rekomendasi yang presisi dan <strong className="text-slate-800 font-bold">data-driven</strong>.
+                      SPK Auto7 Carwash pada awalnya di-develop sebagai <strong className="text-slate-800 font-bold">internal project</strong> operasional perusahaan untuk mengoptimalkan proses pemilihan vendor logistik. Sistem ini menggunakan <em className="text-slate-700 not-italic font-medium">core engine</em> algoritma <strong className="text-red-600 font-bold">AHP dan TOPSIS</strong> guna menghasilkan rekomendasi yang presisi dan <strong className="text-slate-800 font-bold">data-driven</strong>.
                     </p>
                     <p>
                       Versi yang <em className="text-slate-700 not-italic font-medium">live</em> saat ini merupakan <strong className="text-slate-800 font-bold">cloned version</strong> yang di-deploy khusus untuk kebutuhan <em className="text-slate-700 not-italic font-medium">public showcase</em> dan portofolio. Keseluruhan ekosistem aplikasi beserta database-nya telah diisolasi secara penuh ke dalam <strong className="text-red-600 font-bold">sandbox environment</strong>. Dengan begitu, seluruh fungsionalitas sistem dapat di-explore secara <strong className="text-slate-800 font-bold">end-to-end</strong> dengan <strong className="text-red-600 font-bold">zero risk</strong> terhadap kerahasiaan <em className="text-slate-700 not-italic font-medium">real operational data</em> milik perusahaan.
@@ -432,6 +447,7 @@ export default function LoginPage() {
                     Fitur lupa password akan diteruskan langsung ke <strong className="text-slate-800 font-bold">Menu Profil</strong> pada akun Owner. Melalui menu tersebut, pihak Owner dapat meninjau dan menyetujui permintaan pembaruan kata sandi secara manual.
                   </p>
                 </div>
+
               </div>
             </div>
 
@@ -450,7 +466,7 @@ export default function LoginPage() {
                   </div>
                 </div>
                 <span className="text-[13px] font-medium text-slate-600 select-none group-hover:text-slate-900 transition-colors leading-relaxed pt-0.5">
-                  Saya mengerti dan siap explore sistem.
+                  Saya mengerti.
                 </span>
               </label>
 
@@ -467,9 +483,7 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* ==========================================
-          MODAL LUPA PASSWORD (KIRIM KE OWNER)
-          ========================================== */}
+      {/* MODAL LUPA PASSWORD (KIRIM KE OWNER) */}
       {showResetModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300 relative text-center">
