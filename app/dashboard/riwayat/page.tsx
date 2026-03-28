@@ -143,7 +143,7 @@ export default function RiwayatKeputusanPage() {
           <div>
             <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Riwayat Keputusan</h1>
             <p className="text-slate-500 text-sm mt-1">
-              Arsip hasil perhitungan AHP dan TOPSIS yang telah disimpan.
+              Arsip hasil perhitungan AHP dan TOPSIS.
             </p>
           </div>
         </div>

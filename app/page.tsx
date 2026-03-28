@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-// Gw tambahin import Eye dan EyeOff di sini bro
-import { Lock, User, ShieldCheck, AlertCircle, X, KeySquare, Loader2, CheckCircle2, Info, CheckSquare, Eye, EyeOff } from "lucide-react";
+import { Lock, User, ShieldCheck, AlertCircle, X, KeySquare, Loader2, CheckCircle2, Info, CheckSquare, Eye, EyeOff, Code2, MonitorPlay } from "lucide-react";
 import { supabase } from "../lib/supabase"; 
 
 export default function LoginPage() {
@@ -137,7 +136,7 @@ export default function LoginPage() {
       >
         <Info className="w-6 h-6 animate-pulse" />
         <span className="absolute right-full mr-4 bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-          Info Portfolio
+          Informasi Sistem
         </span>
       </button>
 
@@ -271,15 +270,12 @@ export default function LoginPage() {
                       <Lock className="h-5 w-5 text-slate-600 lg:text-slate-400 group-focus-within:text-red-600 transition-colors" />
                     </div>
                     <input
-                      // Tipe inputnya diganti biar dinamis ngikutin state
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      // pr-nya gw gedein dikit (pr-12) biar teks ga nabrak icon mata
                       className="block w-full pl-12 pr-12 py-3.5 bg-white/50 lg:bg-slate-50/50 border border-white/50 lg:border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:ring-2 focus:ring-red-600 focus:border-red-600 outline-none transition-all text-sm font-bold lg:font-medium placeholder-slate-600 lg:placeholder-slate-400 shadow-inner lg:shadow-none hover:bg-white"
                       placeholder="••••••••"
                     />
-                    {/* Ini tombol mata buat unhide passwordnya */}
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -308,7 +304,7 @@ export default function LoginPage() {
                     Memproses Akses...
                   </span>
                 ) : (
-                  <span className="relative z-10">Masuk ke Portal</span>
+                  <span className="relative z-10">Masuk</span>
                 )}
               </button>
             </form>
@@ -327,7 +323,7 @@ export default function LoginPage() {
           MODAL ERROR CUSTOM
           ========================================== */}
       {errorMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200 text-center p-6 relative">
             <button 
               onClick={() => setErrorMessage(null)}
@@ -353,7 +349,7 @@ export default function LoginPage() {
       )}
 
       {/* ==========================================
-          MODAL INFO PORTFOLIO DENGAN CHECKBOX - TEMA MERAH
+          MODAL INFO PORTFOLIO (REFINED UX/UI)
           ========================================== */}
       {showInfoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300">
@@ -361,42 +357,65 @@ export default function LoginPage() {
             
             {/* Header Modal */}
             <div className="bg-red-600 p-6 text-white text-center relative shrink-0">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-white/20 mb-3 backdrop-blur-sm border border-white/30 shadow-inner">
-                <Info className="h-8 w-8 text-white" />
+              <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-white/20 mb-3 backdrop-blur-sm border border-white/30 shadow-inner">
+                <Code2 className="h-7 w-7 text-white" />
               </div>
-              <h2 className="text-2xl font-extrabold tracking-tight">Showcase Portfolio</h2>
-              <p className="text-red-100 text-sm font-medium mt-1">Sistem Pendukung Keputusan Logistik Auto7</p>
+              <h2 className="text-2xl font-extrabold tracking-tight"> Project Showcase</h2>
+              <p className="text-red-100 text-[13px] font-medium mt-1.5">Sistem Pendukung Keputusan Logistik Auto7 Carwash</p>
             </div>
 
-            {/* Content Modal (Bisa di-scroll kalau kepanjangan) */}
-            <div className="p-6 md:p-8 overflow-y-auto grow custom-scrollbar">
-              <div className="space-y-6 text-sm text-slate-600">
+            {/* Content Modal */}
+            <div className="p-6 md:p-8 overflow-y-auto grow custom-scrollbar bg-white">
+              <div className="space-y-8">
                 
                 {/* Section 1: Konteks Project */}
                 <div>
-                  <h3 className="text-slate-900 font-bold flex items-center mb-2 text-base">
-                    <span className="bg-red-100 text-red-700 w-6 h-6 rounded-md inline-flex items-center justify-center mr-2 text-xs">1</span>
-                    Tentang Sistem Ini
+                  <h3 className="text-slate-900 font-bold flex items-center mb-3 text-base">
+                    <div className="bg-red-50 text-red-600 p-1.5 rounded-lg mr-3 border border-red-100 shadow-sm">
+                      <MonitorPlay className="w-4 h-4" />
+                    </div>
+                    Tentang Sistem
                   </h3>
-                  <p className="leading-relaxed pl-8">
-                    Ini adalah versi <strong className="text-red-600">demonstrasi/portfolio</strong> dari SPK Auto7 Carwash. Sistem menggunakan metode <strong className="text-slate-800">AHP + TOPSIS</strong> untuk merekomendasikan layanan logistik. Database aman dan terpisah dari sistem inti perusahaan.
-                  </p>
+                  <div className="space-y-3 text-[14px] leading-relaxed text-slate-600 ml-11">
+                    <p>
+                      SPK Auto7 Carwash di-develop sebagai <strong className="text-slate-800 font-bold">internal project</strong> operasional perusahaan untuk mengoptimalkan proses pemilihan vendor logistik. Sistem ini menggunakan <em className="text-slate-700 not-italic font-medium">core engine</em> algoritma <strong className="text-red-600 font-bold">AHP dan TOPSIS</strong> guna menghasilkan rekomendasi yang presisi dan <strong className="text-slate-800 font-bold">data-driven</strong>.
+                    </p>
+                    <p>
+                      Versi yang <em className="text-slate-700 not-italic font-medium">live</em> saat ini merupakan <strong className="text-slate-800 font-bold">cloned version</strong> yang di-deploy khusus untuk kebutuhan <em className="text-slate-700 not-italic font-medium">public showcase</em> dan portofolio. Keseluruhan ekosistem aplikasi beserta database-nya telah diisolasi secara penuh ke dalam <strong className="text-red-600 font-bold">sandbox environment</strong>. Dengan begitu, seluruh fungsionalitas sistem dapat di-explore secara <strong className="text-slate-800 font-bold">end-to-end</strong> dengan <strong className="text-red-600 font-bold">zero risk</strong> terhadap kerahasiaan <em className="text-slate-700 not-italic font-medium">real operational data</em> milik perusahaan.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Section 2: Info Akun */}
-                <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl pl-8 relative">
-                  <div className="absolute left-0 top-4 -ml-3 bg-red-100 text-red-700 w-6 h-6 rounded-md inline-flex items-center justify-center text-xs font-bold border border-white shadow-sm">2</div>
-                  <h3 className="text-slate-900 font-bold mb-3">Akun Testing Tersedia</h3>
-                  <div className="grid gap-3">
-                    <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                      <div className="font-bold text-red-600 text-xs uppercase tracking-wider mb-1">Role: Owner (Full Access)</div>
-                      <div className="flex justify-between items-center"><span className="text-slate-500 text-xs">Username:</span> <strong className="text-slate-800">owner.auto7</strong></div>
-                      <div className="flex justify-between items-center mt-1"><span className="text-slate-500 text-xs">Password:</span> <strong className="text-slate-800">admin123</strong></div>
+                <div>
+                  <h3 className="text-slate-900 font-bold flex items-center mb-4 text-base">
+                    <div className="bg-blue-50 text-blue-600 p-1.5 rounded-lg mr-3 border border-blue-100 shadow-sm">
+                      <User className="w-4 h-4" />
                     </div>
-                    <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                      <div className="font-bold text-slate-600 text-xs uppercase tracking-wider mb-1">Role: Employee (Limited)</div>
-                      <div className="flex justify-between items-center"><span className="text-slate-500 text-xs">Username:</span> <strong className="text-slate-800">alexganteng</strong></div>
-                      <div className="flex justify-between items-center mt-1"><span className="text-slate-500 text-xs">Password:</span> <strong className="text-slate-800">baksotikus123</strong></div>
+                    Akses Akun
+                  </h3>
+                  <div className="grid sm:grid-cols-2 gap-4 ml-11">
+                    <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                      <div className="font-bold text-red-600 text-xs uppercase tracking-wider mb-2">Role: Owner (Full Access)</div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className="text-slate-500 text-xs">Username:</span> 
+                        <code className="text-slate-800 text-xs font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">owner.auto7</code>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 text-xs">Password:</span> 
+                        <code className="text-slate-800 text-xs font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">admin123</code>
+                      </div>
+                    </div>
+                    <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                      <div className="font-bold text-slate-600 text-xs uppercase tracking-wider mb-2">Role: Employee (Limited)</div>
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className="text-slate-500 text-xs">Username:</span> 
+                        <code className="text-slate-800 text-xs font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">alexganteng</code>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 text-xs">Password:</span> 
+                        <code className="text-slate-800 text-xs font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">baksotikus123</code>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -404,14 +423,15 @@ export default function LoginPage() {
                 {/* Section 3: Fitur Spesifik */}
                 <div>
                   <h3 className="text-slate-900 font-bold flex items-center mb-2 text-base">
-                    <span className="bg-red-100 text-red-700 w-6 h-6 rounded-md inline-flex items-center justify-center mr-2 text-xs">3</span>
-                    Simulasi Lupa Password
+                    <div className="bg-amber-50 text-amber-600 p-1.5 rounded-lg mr-3 border border-amber-100 shadow-sm">
+                      <KeySquare className="w-4 h-4" />
+                    </div>
+                    Guide Lupa Password
                   </h3>
-                  <p className="leading-relaxed pl-8">
-                    Fitur "Lupa Password" di halaman ini dikonfigurasi sebagai simulasi. Permintaan akan dikirimkan ke <strong className="text-slate-800">Dashboard Owner</strong> untuk di-<em>approve</em> secara manual.
+                  <p className="leading-relaxed text-[14px] text-slate-600 ml-11">
+                    Fitur lupa password akan diteruskan langsung ke <strong className="text-slate-800 font-bold">Menu Profil</strong> pada akun Owner. Melalui menu tersebut, pihak Owner dapat meninjau dan menyetujui permintaan pembaruan kata sandi secara manual.
                   </p>
                 </div>
-
               </div>
             </div>
 
@@ -429,8 +449,8 @@ export default function LoginPage() {
                     <CheckSquare className="w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
                   </div>
                 </div>
-                <span className="text-sm font-medium text-slate-700 select-none group-hover:text-slate-900 transition-colors leading-tight pt-0.5">
-                  Saya mengerti bahwa ini adalah lingkungan demo dan siap menjelajahi sistem.
+                <span className="text-[13px] font-medium text-slate-600 select-none group-hover:text-slate-900 transition-colors leading-relaxed pt-0.5">
+                  Saya mengerti dan siap explore sistem.
                 </span>
               </label>
 
@@ -451,7 +471,7 @@ export default function LoginPage() {
           MODAL LUPA PASSWORD (KIRIM KE OWNER)
           ========================================== */}
       {showResetModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300 relative text-center">
             
             <button 

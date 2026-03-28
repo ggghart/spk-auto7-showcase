@@ -250,7 +250,7 @@ export default function PenilaianAHPPage() {
               <div>
                 <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Langkah 1: Input Matriks AHP</h1>
                 <p className="text-slate-500 text-sm mt-1">
-                  Bandingkan tingkat kepentingan antar kriteria dari database.
+                  Bandingkan tingkat kepentingan antar kriteria.
                 </p>
               </div>
             </div>
@@ -596,7 +596,7 @@ export default function PenilaianAHPPage() {
             </div>
             <h3 className="text-xl font-bold text-slate-800 mb-2">Peringatan</h3>
             <p className="text-sm text-slate-500 mb-8 px-2 leading-relaxed">
-              Keterangan Penilaian wajib diisi bro! Silakan isi terlebih dahulu sebelum menghitung dan validasi matriks.
+              Keterangan Penilaian wajib diisi! Silakan isi terlebih dahulu sebelum menghitung dan validasi matriks.
             </p>
             <button
               onClick={() => setShowWarning(false)}
