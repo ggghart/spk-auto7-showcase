@@ -147,7 +147,7 @@ export default function LoginPage() {
       >
         <Info className="w-6 h-6 animate-pulse" />
         <span className="absolute right-full mr-4 bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-          Info Portfolio
+          Project Info
         </span>
       </button>
 
@@ -393,10 +393,10 @@ export default function LoginPage() {
                   </h3>
                   <div className="space-y-3 text-[14px] leading-relaxed text-slate-600 ml-11">
                     <p>
-                      SPK Auto7 Carwash pada awalnya di-develop sebagai <strong className="text-slate-800 font-bold">internal project</strong> operasional perusahaan untuk mengoptimalkan proses pemilihan vendor logistik. Sistem ini menggunakan <em className="text-slate-700 not-italic font-medium">core engine</em> algoritma <strong className="text-red-600 font-bold">AHP dan TOPSIS</strong> guna menghasilkan rekomendasi yang presisi dan <strong className="text-slate-800 font-bold">data-driven</strong>.
+                      Sistem ini didevelop sebagai <strong className="text-slate-800 font-bold">internal project</strong> operasional perusahaan untuk mengoptimalkan proses pemilihan vendor logistik. Sistem ini menggunakan <em className="text-slate-700 not-italic font-medium">core engine</em> algoritma <strong className="text-red-600 font-bold">AHP dan TOPSIS</strong> guna menghasilkan rekomendasi yang presisi dan <strong className="text-slate-800 font-bold">data-driven</strong>.
                     </p>
                     <p>
-                      Versi yang <em className="text-slate-700 not-italic font-medium">live</em> saat ini merupakan <strong className="text-slate-800 font-bold">cloned version</strong> yang di-deploy khusus untuk kebutuhan <em className="text-slate-700 not-italic font-medium">public showcase</em> dan portofolio. Keseluruhan ekosistem aplikasi beserta database-nya telah diisolasi secara penuh ke dalam <strong className="text-red-600 font-bold">sandbox environment</strong>. Dengan begitu, seluruh fungsionalitas sistem dapat di-explore secara <strong className="text-slate-800 font-bold">end-to-end</strong> dengan <strong className="text-red-600 font-bold">zero risk</strong> terhadap kerahasiaan <em className="text-slate-700 not-italic font-medium">real operational data</em> milik perusahaan.
+                      Versi saat ini merupakan <strong className="text-slate-800 font-bold">cloned version</strong> yang di-deploy khusus untuk kebutuhan <em className="text-slate-700 not-italic font-medium">public showcase</em> dan portofolio. Keseluruhan ekosistem aplikasi beserta database-nya telah diisolasi secara penuh ke dalam <strong className="text-red-600 font-bold">sandbox environment</strong>. Dengan begitu, seluruh fungsionalitas sistem dapat di-explore secara <strong className="text-slate-800 font-bold">end-to-end</strong> dengan <strong className="text-red-600 font-bold">zero risk</strong> terhadap kerahasiaan <em className="text-slate-700 not-italic font-medium">real operational data</em> milik perusahaan.
                     </p>
                   </div>
                 </div>
