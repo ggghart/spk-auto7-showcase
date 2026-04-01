@@ -283,12 +283,24 @@ export default function PenilaianAHPPage() {
                   <Info className="w-4 h-4 mr-1.5 text-red-500" /> Panduan Skala AHP
                 </h3>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs"><span className="font-extrabold text-slate-800 text-sm mr-1.5">1</span>Sama Penting</div>
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs"><span className="font-extrabold text-slate-800 text-sm mr-1.5">3</span>Sedikit Lebih Penting</div>
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs"><span className="font-extrabold text-slate-800 text-sm mr-1.5">5</span>Lebih Penting</div>
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs"><span className="font-extrabold text-slate-800 text-sm mr-1.5">7</span>Sangat Penting</div>
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs"><span className="font-extrabold text-slate-800 text-sm mr-1.5">9</span>Mutlak Penting</div>
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs text-slate-500 flex items-center justify-center italic">2, 4, 6, 8 (Nilai Tengah)</div>
+                  <div className="bg-white text-slate-800 px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs">
+                    <span className="font-extrabold text-slate-800 text-sm mr-1.5">1</span>Sama Penting
+                  </div>
+                  <div className="bg-white text-slate-800 px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs">
+                    <span className="font-extrabold text-slate-800 text-sm mr-1.5">3</span>Sedikit Lebih Penting
+                  </div>
+                  <div className="bg-white text-slate-800 px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs">
+                    <span className="font-extrabold text-slate-800 text-sm mr-1.5">5</span>Lebih Penting
+                  </div>
+                  <div className="bg-white text-slate-800 px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs">
+                    <span className="font-extrabold text-slate-800 text-sm mr-1.5">7</span>Sangat Penting
+                  </div>
+                  <div className="bg-white text-slate-800 px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs">
+                    <span className="font-extrabold text-slate-800 text-sm mr-1.5">9</span>Mutlak Penting
+                  </div>
+                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs text-slate-500 flex items-center justify-center italic">
+                    2, 4, 6, 8 (Nilai Tengah)
+                  </div>
                 </div>
                 <p className="text-[10px] text-slate-400 mt-2 font-medium italic">
                   *Pilih pecahan (1/3, 1/5) jika kriteria di kolom KIRI lebih kecil kepentingannya dari kolom ATAS.
@@ -437,11 +449,21 @@ export default function PenilaianAHPPage() {
                   <Info className="w-4 h-4 mr-1.5 text-blue-500" /> Panduan Skala
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs whitespace-nowrap"><span className="font-extrabold text-rose-600 text-sm mr-1.5">1</span>Sangat Buruk</div>
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs whitespace-nowrap"><span className="font-extrabold text-orange-500 text-sm mr-1.5">2</span>Buruk</div>
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs whitespace-nowrap"><span className="font-extrabold text-amber-500 text-sm mr-1.5">3</span>Cukup</div>
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs whitespace-nowrap"><span className="font-extrabold text-lime-600 text-sm mr-1.5">4</span>Baik</div>
-                  <div className="bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs whitespace-nowrap"><span className="font-extrabold text-emerald-600 text-sm mr-1.5">5</span>Sangat Baik</div>
+                  <div className="bg-white text-slate-800 px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs whitespace-nowrap">
+                    <span className="font-extrabold text-rose-600 text-sm mr-1.5">1</span>Sangat Buruk
+                  </div>
+                  <div className="bg-white text-slate-800 px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs whitespace-nowrap">
+                    <span className="font-extrabold text-orange-500 text-sm mr-1.5">2</span>Buruk
+                  </div>
+                  <div className="bg-white text-slate-800 px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs whitespace-nowrap">
+                    <span className="font-extrabold text-amber-500 text-sm mr-1.5">3</span>Cukup
+                  </div>
+                  <div className="bg-white text-slate-800 px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs whitespace-nowrap">
+                    <span className="font-extrabold text-lime-600 text-sm mr-1.5">4</span>Baik
+                  </div>
+                  <div className="bg-white text-slate-800 px-3 py-2 rounded-lg border border-slate-200 shadow-sm text-xs whitespace-nowrap">
+                    <span className="font-extrabold text-emerald-600 text-sm mr-1.5">5</span>Sangat Baik
+                  </div>
                 </div>
               </div>
 

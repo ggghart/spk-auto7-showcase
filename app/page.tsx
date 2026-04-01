@@ -45,29 +45,20 @@ export default function LoginPage() {
   // FUNGSI ANIMASI KURSOR (JALAN DI KOLOM KANAN AJA)
   // ==========================================
   const handleRightSideMouseMove = (e: React.MouseEvent) => {
-    // Karena event ini cuma ada di div kanan, kita aman ngambil nilai X & Y kursor
     const { clientX, clientY } = e;
     const width = window.innerWidth;
     const height = window.innerHeight;
     
-    // Hitung rasio Y dari -1 (atas layar) sampai 1 (bawah layar)
     const yRatio = (clientY - height / 2) / (height / 2);
-    
-    // Hitung rasio X dari 0 (tengah layar) sampai 1 (paling kanan)
     const xRatio = (clientX - width / 2) / (width / 2);
     
-    // Logika Orientasi: 
-    // yRatio ngatur moncong naik turun (Pitch / rotateZ)
-    // xRatio ngatur seberapa nengok dia ke arah kursor (Yaw / rotateY)
-    const rotateZ = yRatio * 15; // Maksimal nunduk/ndangak 15 derajat
-    const rotateY = xRatio * 20; // Maksimal nengok 20 derajat ke arah layar kanan
+    const rotateZ = yRatio * 15;
+    const rotateY = xRatio * 20; 
     
-    // Set style transformnya (kasih scale 1.15 biar seakan-akan maju dikit)
     setCarTransform(`perspective(1000px) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg) scale(1.15)`);
   };
 
   const handleRightSideMouseLeave = () => {
-    // Kalau kursor keluar dari form login, mobil balik ke posisi semula
     setCarTransform("perspective(1000px) rotateY(0deg) rotateZ(0deg) scale(1)");
   };
 
@@ -134,6 +125,19 @@ export default function LoginPage() {
     setResetUsername("");
     setResetSuccess(false);
     setResetError(null);
+  };
+
+  // ==========================================
+  // FUNGSI AUTO FILL
+  // ==========================================
+  const handleAutoFill = (role: 'owner' | 'employee') => {
+    if (role === 'owner') {
+      setUsername('owner.auto7');
+      setPassword('admin123');
+    } else {
+      setUsername('alexganteng');
+      setPassword('baksotikus123');
+    }
   };
 
   return (
@@ -233,22 +237,43 @@ export default function LoginPage() {
             ></div>
           </div>
 
-          <div className="relative z-10 p-8 sm:p-10 lg:p-12 space-y-10">
-            <div className="text-left">
+          <div className="relative z-10 p-8 sm:p-10 lg:p-12 space-y-8">
+            <div className="text-left space-y-4">
               <Image 
                 src="/auto7.png" 
                 alt="Logo Auto7" 
                 width={160} 
                 height={50} 
                 priority
-                className="object-contain -ml-2 mb-4 drop-shadow-sm lg:drop-shadow-none"
+                className="object-contain -ml-2 drop-shadow-sm lg:drop-shadow-none"
               />
-              <h1 className="text-2xl font-bold text-slate-900 tracking-tight drop-shadow-sm lg:drop-shadow-none">
-                Selamat Datang Kembali
-              </h1>
-              <p className="text-slate-700 lg:text-slate-500 font-medium text-sm mt-1 drop-shadow-sm lg:drop-shadow-none">
-                Silakan login ke SPK Logistik Auto7.
-              </p>
+              <div>
+                <h1 className="text-2xl font-bold text-slate-900 tracking-tight drop-shadow-sm lg:drop-shadow-none">
+                  Selamat Datang Kembali
+                </h1>
+                <p className="text-slate-700 lg:text-slate-500 font-medium text-sm mt-1 drop-shadow-sm lg:drop-shadow-none mb-4">
+                  Silakan login ke SPK Logistik Auto7.
+                </p>
+                
+                {/* TOMBOL QUICK ACCESS DEMO - TANPA ICON */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Demo Login:</span>
+                  <button 
+                    onClick={() => handleAutoFill('owner')}
+                    className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:border-red-400 hover:text-red-600 rounded-md transition-all shadow-sm flex items-center"
+                    type="button"
+                  >
+                    Owner
+                  </button>
+                  <button 
+                    onClick={() => handleAutoFill('employee')}
+                    className="px-3 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 hover:border-blue-400 hover:text-blue-600 rounded-md transition-all shadow-sm flex items-center"
+                    type="button"
+                  >
+                    Employee
+                  </button>
+                </div>
+              </div>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-6">
@@ -330,8 +355,9 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="absolute bottom-6 w-full text-center z-10 px-4">
-          <p className="text-[11px] sm:text-xs font-semibold tracking-wider text-white/60 lg:text-slate-400 hover:text-white lg:hover:text-slate-600 transition-colors cursor-default drop-shadow-sm lg:drop-shadow-none pointer-events-none">
+        {/* FOOTER: TECH STACK & COPYRIGHT RATA TENGAH */}
+        <div className="absolute bottom-6 w-full flex flex-col items-center justify-center z-10 pointer-events-none gap-2 px-4">
+          <p className="text-[11px] sm:text-xs font-semibold tracking-wider text-white/60 lg:text-slate-400 hover:text-white lg:hover:text-slate-600 transition-colors cursor-default drop-shadow-sm lg:drop-shadow-none">
             &copy; 2026 AUTO7 Carwash. All rights reserved.
           </p>
         </div>
